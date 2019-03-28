@@ -2,6 +2,7 @@ import os
 
 from gumo.core import configure as core_configure
 from gumo.datastore import configure as datastore_configure
+from gumo.task import configure as task_configure
 
 if os.environ.get('GOOGLE_APPLICATION_CREDENTIALS') is None:
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/path/to/credential.json'
@@ -16,4 +17,8 @@ datastore_configure(
     use_local_emulator=True,
     emulator_host='datastore_emulator:8081',
     namespace=None,
+)
+
+task_configure(
+    default_queue_name='gumo-default-queue'
 )
