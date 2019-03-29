@@ -24,11 +24,11 @@ setuptools.setup(
     name=name,
     version=version,
     author="Gumo Project Team",
-    author_email="gumo-organizer@levii.co.jp",
+    author_email="gumo-py@googlegroups.com",
     description=description,
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/gumo-py/gumo",
+    url="https://github.com/gumo-py/gumo-task",
     packages=packages,
     namespaces=namespaces,
     classifiers=[
