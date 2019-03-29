@@ -1,6 +1,6 @@
 package_name = gumo-task
 
-export PATH = venv/bin:$(shell echo $PATH)
+export PATH := venv/bin:$(shell echo ${PATH})
 
 .PHONY: setup
 setup:
@@ -27,12 +27,12 @@ test-install:
 		${package_name}
 
 .PHONY: build
-build:
+build: clean pip-compile
 	python setup.py sdist bdist_wheel
 
 .PHONY: clean
 clean:
-	rm -rf ${package_name}.egg-info dist build
+	rm -rf $(subst -,_,${package_name}).egg-info dist build
 
 .PHONY: pip-compile
 pip-compile:
@@ -41,6 +41,7 @@ pip-compile:
 		--upgrade-package gumo-datastore \
 		--output-file requirements.txt \
 		requirements.in
+	pip3 install --ignore-installed -r requirements.txt
 
 .PHONY: test
 test: build

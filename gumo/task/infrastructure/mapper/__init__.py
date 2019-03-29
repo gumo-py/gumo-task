@@ -1,6 +1,6 @@
 from injector import inject
 
-from gumo.datastore import EntityKey
+from gumo.core import EntityKey
 from gumo.task.domain import GumoTask
 from gumo.datastore.infrastructure import EntityKeyMapper
 

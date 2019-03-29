@@ -2,7 +2,7 @@ from injector import inject
 
 from typing import Optional
 
-from gumo.core.domain import GumoConfiguration
+from gumo.core import GumoConfiguration
 from gumo.datastore.domain.configuration import DatastoreConfiguration
 from gumo.task.domain.configuration import TaskConfiguration
 from gumo.task.domain import GumoTask

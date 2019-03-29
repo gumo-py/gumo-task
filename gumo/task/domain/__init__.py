@@ -3,7 +3,7 @@ import datetime
 
 from typing import Optional
 
-from gumo.datastore import EntityKey
+from gumo.core import EntityKey
 
 
 @dataclasses.dataclass(frozen=True)
