@@ -37,15 +37,15 @@ class CloudTasksPayloadFactory:
         }
 
         if self._task.payload is not None:
-            app_engine_http_request['body'] = self._task.payload
-
-        if self._task.schedule_time is not None:
-            app_engine_http_request['schedule_time'] = self._task.schedule_time
+            app_engine_http_request['body'] = self._payload_as_bytes()
 
         task_dict = {
             'app_engine_http_request': app_engine_http_request,
             'name': f'{self._parent}/tasks/{self._task.key.name()}',
         }
+
+        if self._task.schedule_time is not None:
+            task_dict['schedule_time'] = self._schedule_time_as_pb()
 
         return task_dict
 
