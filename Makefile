@@ -43,7 +43,17 @@ pip-compile:
 		requirements.in
 	pip3 install --ignore-installed -r requirements.txt
 
+
+export DATASTORE_EMULATOR_HOST := 127.0.0.1:8082
+
 .PHONY: test
 test: build
 	pip3 install dist/${package_name}*.tar.gz
-	pytest -v tests/config.py tests/
+	pytest -v --junit-xml=test-reports/results.xml tests/config.py tests
+
+.PHONY: emulator-start emulator-stop
+emulator-start:
+	docker-compose up --detach
+
+emulator-stop:
+	docker-compose stop
