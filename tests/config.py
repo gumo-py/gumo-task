@@ -9,16 +9,17 @@ if os.environ.get('GOOGLE_APPLICATION_CREDENTIALS') is None:
 
 
 core_configure(
-    google_cloud_project='gumo-sample',
+    google_cloud_project='gumo-task',
     google_cloud_location='asia-northeast1',
 )
 
 datastore_configure(
     use_local_emulator=True,
-    emulator_host='datastore_emulator:8081',
+    emulator_host=os.environ.get('DATASTORE_EMULATOR_HOST', 'datastore_emulator:8081'),
     namespace=None,
 )
 
 task_configure(
-    default_queue_name='gumo-default-queue'
+    default_queue_name='gumo-default-queue',
+    use_local_task_emulator=True,
 )
