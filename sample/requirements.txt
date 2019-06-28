@@ -1,2 +1,2 @@
 flask
-gumo-datastore
+gumo-task
