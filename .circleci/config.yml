@@ -6,6 +6,7 @@ jobs:
       - image: quay.io/gumo/datastore-emulator:v241
         command: --no-store-on-disk --consistency=1
         environment:
+          GOOGLE_CLOUD_PROJECT: gumo-task
           DATASTORE_PROJECT_ID: gumo-task
           DATASTORE_LISTEN_ADDRESS: 0.0.0.0:8082
 
