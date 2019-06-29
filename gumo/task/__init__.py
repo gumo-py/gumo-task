@@ -1,5 +1,5 @@
 from gumo.task._configuration import configure
-from gumo.task.domain.configuration import TaskConfiguration
+from gumo.task.infrastructure import TaskConfiguration
 from gumo.task.application import enqueue
 
 
