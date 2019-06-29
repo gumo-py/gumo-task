@@ -1,4 +1,5 @@
 from logging import getLogger
+from injector import singleton
 
 from typing import Union
 
@@ -40,7 +41,7 @@ def configure(
     )
     logger.debug(f'Gumo.Task is configured, config={config}')
 
-    injector.binder.bind(TaskConfiguration, to=config)
+    injector.binder.bind(TaskConfiguration, to=config, scope=singleton)
     injector.binder.install(task_bind)
 
     return config
