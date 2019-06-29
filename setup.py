@@ -7,7 +7,7 @@ description = 'Gumo Task Library'
 dependencies = [
     'gumo-core >= 0.0.13',
     'gumo-datastore >= 0.0.11',
-    'google-cloud-tasks >= 0.3.0',
+    'google-cloud-tasks >= 1.1.0',
 ]
 
 with open("README.md", "r") as fh:
