@@ -7,7 +7,6 @@ from typing import Optional
 from google.cloud import tasks
 from google.protobuf import timestamp_pb2
 
-from gumo.core import GumoConfiguration
 from gumo.task.domain.configuration import TaskConfiguration
 from gumo.task.domain import GumoTask
 
@@ -70,10 +69,8 @@ class CloudTasksRepository:
     @inject
     def __init__(
             self,
-            gumo_configuration: GumoConfiguration,
             task_configuration: TaskConfiguration,
     ):
-        self._gumo_configuration = gumo_configuration
         self._task_configuration = task_configuration
         self._cloud_tasks_client = tasks.CloudTasksClient()
 
@@ -82,8 +79,8 @@ class CloudTasksRepository:
             queue_name = self._task_configuration.default_queue_name
 
         return self._cloud_tasks_client.queue_path(
-            project=self._gumo_configuration.google_cloud_project.value,
-            location=self._gumo_configuration.google_cloud_location.value,
+            project=self._task_configuration.google_cloud_project.value,
+            location=self._task_configuration.cloud_tasks_location.locationID,
             queue=queue_name,
         )
 
