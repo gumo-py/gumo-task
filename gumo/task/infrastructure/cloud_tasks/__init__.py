@@ -40,9 +40,9 @@ class CloudTasksPayloadFactory:
             'relative_uri': self._task.relative_uri,
         }
 
-        if self._task_configuration.gae_service:
+        if self._task_configuration.gae_service_name:
             app_engine_http_request['app_engine_routing'] = {
-                'service': self._task_configuration.gae_service,
+                'service': self._task_configuration.gae_service_name,
             }
 
         if self._task.payload is not None:
