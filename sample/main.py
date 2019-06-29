@@ -63,6 +63,17 @@ def enqueue_handler():
     )
 
     task3 = enqueue(
+        url='/delayed-task',
+        method='POST',
+        payload={
+            'enqueued_at': datetime.datetime.utcnow().isoformat(),
+            'args': flask.request.args,
+        },
+        schedule_time=datetime.datetime.utcnow() + datetime.timedelta(hours=1),
+        queue_name=DELAYED_QUEUE_NAME
+    )
+
+    task4 = enqueue(
         url='/failed-task',
         method='GET',
     )
@@ -72,37 +83,46 @@ def enqueue_handler():
     task1 = {task1.key.key_literal()}
     task2 = {task2.key.key_literal()}
     task3 = {task3.key.key_literal()}
+    task4 = {task4.key.key_literal()}
     ----
     {task1}
     ----
     {task2}
     ----
     {task3}
+    ----
+    {task4}
     """
 
     return flask.Response(text, content_type='text/plain')
 
 
-@app.route('/enqueued-task')
+@app.route('/enqueued-task', methods=['GET', 'POST'])
 def enqueued_task():
     logger.info(f'enqueued-task called.')
     logger.info(f'flask.request.args = {flask.request.args}')
+    logger.info(f'flask.request.data = {flask.request.data}')
+    logger.info(f'flask.request.json = {flask.request.json}')
 
     return 'ok'
 
 
-@app.route('/delayed-task')
+@app.route('/delayed-task', methods=['GET', 'POST'])
 def delayed_task():
     logger.info(f'delayed-task called.')
     logger.info(f'flask.request.args = {flask.request.args}')
+    logger.info(f'flask.request.data = {flask.request.data}')
+    logger.info(f'flask.request.json = {flask.request.json}')
 
     return 'ok'
 
 
-@app.route('/failed-task')
+@app.route('/failed-task', methods=['GET', 'POST'])
 def failed_task():
     logger.info(f'failed-task called.')
     logger.info(f'flask.request.args = {flask.request.args}')
+    logger.info(f'flask.request.data = {flask.request.data}')
+    logger.info(f'flask.request.json = {flask.request.json}')
 
     return flask.Response('failed', status=500)
 
