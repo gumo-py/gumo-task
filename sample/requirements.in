@@ -1,0 +1,4 @@
+flask
+gumo-core
+gumo-datastore
+injector==0.15.0
