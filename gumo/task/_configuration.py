@@ -4,6 +4,8 @@ from injector import singleton
 from typing import Union
 from typing import Optional
 
+from google.cloud import tasks
+
 from gumo.core.injector import injector
 from gumo.task.infrastructure import TaskConfiguration
 from gumo.task.bind import task_bind
@@ -44,5 +46,6 @@ def configure(
 
     injector.binder.bind(TaskConfiguration, to=config, scope=singleton)
     injector.binder.install(task_bind)
+    injector.binder.bind(tasks.CloudTasksClient, to=tasks.CloudTasksClient(), scope=singleton)
 
     return config
