@@ -1,5 +1,7 @@
 import dataclasses
 import os
+import threading
+
 from logging import getLogger
 from typing import ClassVar
 from typing import Optional
@@ -51,10 +53,13 @@ class TaskConfiguration:
     _GOOGLE_CLOUD_PROJECT_ENV_KEY: ClassVar = 'GOOGLE_CLOUD_PROJECT'
     _GAE_SERVICE_ENV_KEY: ClassVar = 'GAE_SERVICE'
 
+    _lock: ClassVar = threading.Lock()
+
     def __post_init__(self):
-        self._set_google_cloud_project()
-        self._set_gae_service_name()
-        self._set_cloud_tasks_location()
+        with self._lock:
+            self._set_google_cloud_project()
+            self._set_gae_service_name()
+            self._set_cloud_tasks_location()
 
     def _set_google_cloud_project(self):
         if isinstance(self.google_cloud_project, str):
