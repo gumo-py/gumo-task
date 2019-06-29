@@ -2,6 +2,7 @@ from logging import getLogger
 from injector import singleton
 
 from typing import Union
+from typing import Optional
 
 from gumo.core.injector import injector
 from gumo.task.infrastructure import TaskConfiguration
@@ -15,7 +16,7 @@ class ConfigurationFactory:
     @classmethod
     def build(
             cls,
-            default_queue_name: str,
+            default_queue_name: Optional[str] = None,
             use_local_task_emulator: Union[str, bool, None] = False
     ) -> TaskConfiguration:
         use_emulator = False
@@ -32,7 +33,7 @@ class ConfigurationFactory:
 
 
 def configure(
-        default_queue_name: str,
+        default_queue_name: Optional[str] = None,
         use_local_task_emulator: Union[str, bool, None] = False
 ) -> TaskConfiguration:
     config = ConfigurationFactory.build(
