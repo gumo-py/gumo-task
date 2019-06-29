@@ -56,6 +56,10 @@ class CloudTasksPayloadFactory:
 
         if self._task.schedule_time is not None:
             task_dict['schedule_time'] = self._schedule_time_as_pb()
+            import datetime
+            logger.info(f'now = {datetime.datetime.utcnow()}, {datetime.datetime.utcnow().timestamp()}')
+            logger.info(f'task.schedule_time {self._task.schedule_time}, {self._task.schedule_time.timestamp()}')
+            logger.info(f'schedule_time_as_pb {self._schedule_time_as_pb()}')
 
         return task_dict
 
