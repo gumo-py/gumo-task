@@ -1,4 +1,5 @@
 import json
+import datetime
 from logging import getLogger
 from injector import inject
 from typing import Optional
@@ -28,8 +29,9 @@ class CloudTasksPayloadFactory:
         return json.dumps(self._task.payload, ensure_ascii=False).encode('utf-8')
 
     def _schedule_time_as_pb(self) -> timestamp_pb2.Timestamp:
+        unix_timestamp = int((self._task.schedule_time - datetime.datetime(1970, 1, 1)).total_seconds())
         return timestamp_pb2.Timestamp(
-            seconds=int(self._task.schedule_time.timestamp())
+            seconds=unix_timestamp
         )
 
     def build(self) -> dict:
