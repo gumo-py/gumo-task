@@ -45,6 +45,9 @@ class CloudTasksPayloadFactory:
 
         if self._task.payload is not None:
             app_engine_http_request['body'] = self._payload_as_bytes()
+            if 'headers' not in app_engine_http_request:
+                app_engine_http_request['headers'] = {}
+            app_engine_http_request['headers']['Content-Type'] = 'application/json'
 
         task_dict = {
             'app_engine_http_request': app_engine_http_request,
