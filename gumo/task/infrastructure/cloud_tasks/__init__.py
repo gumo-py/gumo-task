@@ -16,9 +16,11 @@ logger = getLogger(__name__)
 class CloudTasksPayloadFactory:
     def __init__(
             self,
+            task_configuration: TaskConfiguration,
             parent: str,
             task: GumoTask,
     ):
+        self._task_configuration = task_configuration
         self._parent = parent
         self._task = task
 
@@ -35,6 +37,11 @@ class CloudTasksPayloadFactory:
             'http_method': self._task.method,
             'relative_uri': self._task.relative_uri,
         }
+
+        if self._task_configuration.gae_service:
+            app_engine_http_request['app_engine_routing'] = {
+                'service': self._task_configuration.gae_service,
+            }
 
         if self._task.payload is not None:
             app_engine_http_request['body'] = self._payload_as_bytes()
@@ -77,7 +84,11 @@ class CloudTasksRepository:
             queue_name: Optional[str] = None
     ):
         parent = self._build_parent_path(queue_name=queue_name)
-        task_dict = CloudTasksPayloadFactory(parent=parent, task=task).build()
+        task_dict = CloudTasksPayloadFactory(
+            task_configuration=self._task_configuration,
+            parent=parent,
+            task=task
+        ).build()
 
         logger.debug(f'Create task parent={parent}, task={task_dict}')
 
