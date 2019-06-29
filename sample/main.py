@@ -5,18 +5,26 @@ import os
 import datetime
 
 from gumo.core import configure as core_configure
+from gumo.datastore import configure as datastore_configure
 from gumo.task import configure as task_configure
 from gumo.task import enqueue
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+# gcloud tasks queues create [QUEUE_ID]
 DEFAULT_QUEUE_NAME = 'gumo-task-test-queue'
 DELAYED_QUEUE_NAME = 'gumo-task-delayed-test-queue'
 
 core_configure(
     google_cloud_project=os.environ['GOOGLE_CLOUD_PROJECT'],
     google_cloud_location='us-central1',
+)
+
+datastore_configure(
+    use_local_emulator=False,
+    emulator_host=None,
+    namespace=None,
 )
 
 task_configure(
@@ -33,7 +41,7 @@ def hello():
 
 
 @app.route('/enqueue')
-def enqueue():
+def enqueue_handler():
     task1 = enqueue(
         url='/enqueued-task',
         method='POST',
