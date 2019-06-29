@@ -1,5 +1,5 @@
 from gumo.task._configuration import ConfigurationFactory
-from gumo.task.domain.configuration import TaskConfiguration
+from gumo.task.infrastructure import TaskConfiguration
 
 
 def test_configuration_factory_build():

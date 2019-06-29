@@ -3,7 +3,7 @@ from logging import getLogger
 from typing import Union
 
 from gumo.core.injector import injector
-from gumo.task.domain.configuration import TaskConfiguration
+from gumo.task.infrastructure import TaskConfiguration
 from gumo.task.bind import task_bind
 
 

@@ -8,7 +8,7 @@ from gumo.task.domain import GumoTask
 
 from gumo.task.application.factory import GumoTaskFactory
 from gumo.task.application.repository import GumoTaskRepository
-from gumo.task.domain.configuration import TaskConfiguration
+from gumo.task.infrastructure import TaskConfiguration
 
 logger = getLogger(__name__)
 
@@ -24,6 +24,9 @@ def enqueue(
     if queue_name is None:
         task_config = injector.get(TaskConfiguration)  # type: TaskConfiguration
         queue_name = task_config.default_queue_name
+
+    if queue_name is None:
+        raise ValueError(f'queue_name is not defined.')
 
     task = GumoTaskFactory().build_for_new(
         relative_uri=url,
