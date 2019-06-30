@@ -8,7 +8,6 @@ from typing import Optional
 from typing import Union
 
 from googleapiclient import discovery
-from googleapiclient.errors import HttpError
 from gumo.core import GoogleCloudProjectID
 from gumo.core import get_google_oauth_credential
 
@@ -82,25 +81,23 @@ class TaskConfiguration:
         if isinstance(self.cloud_tasks_location, CloudTaskLocation):
             return
 
-        try:
-            self.cloud_tasks_location = _get_cloud_tasks_locations(google_cloud_project=self.google_cloud_project)
-        except HttpError as e:
-            logger.debug(f'Cloud Tasks Location API returns {e}')
+        if self._FALLBACK_CLOUD_TASKS_LOCATION in os.environ:
+            self._set_cloud_tasks_location_on_fallback()
+            return
 
-            if self._FALLBACK_CLOUD_TASKS_LOCATION in os.environ:
-                location_id = os.environ[self._FALLBACK_CLOUD_TASKS_LOCATION]
-                logger.debug(f'Fallback to location={location_id} via env-vars "{self._FALLBACK_CLOUD_TASKS_LOCATION}"')
+        self.cloud_tasks_location = _get_cloud_tasks_locations(google_cloud_project=self.google_cloud_project)
 
-                self.cloud_tasks_location = CloudTaskLocation(
-                    name='projects/{project_id}/locations/{location_id}'.format(
-                        project_id=self.google_cloud_project.value,
-                        location_id=location_id,
-                    ),
-                    location_id=location_id,
-                    labels={
-                        'cloud.googleapis.com/region': location_id,
-                    }
-                )
-                return
+    def _set_cloud_tasks_location_on_fallback(self):
+        location_id = os.environ[self._FALLBACK_CLOUD_TASKS_LOCATION]
+        logger.debug(f'Fallback to location={location_id} via env-vars "{self._FALLBACK_CLOUD_TASKS_LOCATION}"')
 
-            raise e
+        self.cloud_tasks_location = CloudTaskLocation(
+            name='projects/{project_id}/locations/{location_id}'.format(
+                project_id=self.google_cloud_project.value,
+                location_id=location_id,
+            ),
+            location_id=location_id,
+            labels={
+                'cloud.googleapis.com/region': location_id,
+            }
+        )
