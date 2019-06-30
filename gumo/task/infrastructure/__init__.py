@@ -37,7 +37,7 @@ def _get_cloud_tasks_locations(google_cloud_project: GoogleCloudProjectID) -> Op
 
     return CloudTaskLocation(
         name=location.get('name'),
-        locationID=location.get('locationId'),
+        location_id=location.get('locationId'),
         labels=location.get('labels')
     )
 
