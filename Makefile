@@ -8,14 +8,14 @@ setup:
 	pip3 install --ignore-installed twine wheel pytest pip-tools
 	pip3 install --ignore-installed -r requirements.txt
 
-.PHONY: deploy
-deploy: clean build
+.PHONY: release
+release: clean build
 	python -m twine upload \
 		--repository-url https://upload.pypi.org/legacy/ \
 		dist/*
 
-.PHONY: test-deploy
-test-deploy: clean build
+.PHONY: test-release
+test-release: clean build
 	python -m twine upload \
 		--repository-url https://test.pypi.org/legacy/ \
 		dist/*

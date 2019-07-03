@@ -7,6 +7,7 @@ from gumo.task import configure as task_configure
 if os.environ.get('GOOGLE_APPLICATION_CREDENTIALS') is None:
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/path/to/credential.json'
 
+os.environ['_FALLBACK_CLOUD_TASKS_LOCATION'] = 'us-central1'
 
 core_configure(
     google_cloud_project='gumo-task',

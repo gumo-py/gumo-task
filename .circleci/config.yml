@@ -6,6 +6,7 @@ jobs:
       - image: quay.io/gumo/datastore-emulator:v241
         command: --no-store-on-disk --consistency=1
         environment:
+          GOOGLE_CLOUD_PROJECT: gumo-task
           DATASTORE_PROJECT_ID: gumo-task
           DATASTORE_LISTEN_ADDRESS: 0.0.0.0:8082
 
@@ -20,9 +21,9 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "requirements.txt" }}
+            - 20190628-00-dependencies-{{ checksum "requirements.txt" }}
             # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - 20190628-00-dependencies-
 
       - run:
           name: install dependencies
@@ -36,7 +37,7 @@ jobs:
       - save_cache:
           paths:
             - ./venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
+          key: 20190628-00-dependencies-{{ checksum "requirements.txt" }}
 
       - run:
           name: prepare credentials

@@ -3,11 +3,11 @@ from logging import getLogger
 from injector import inject
 from typing import Optional
 
-from google.cloud import tasks_v2beta3
+from google.cloud import tasks
 from google.protobuf import timestamp_pb2
 
 from gumo.core import GumoConfiguration
-from gumo.task.domain.configuration import TaskConfiguration
+from gumo.task.infrastructure import TaskConfiguration
 from gumo.task.domain import GumoTask
 
 logger = getLogger(__name__)
@@ -56,10 +56,11 @@ class CloudTasksRepository:
             self,
             gumo_configuration: GumoConfiguration,
             task_configuration: TaskConfiguration,
+            cloud_tasks_client: tasks.CloudTasksClient,
     ):
         self._gumo_configuration = gumo_configuration
         self._task_configuration = task_configuration
-        self._cloud_tasks_client = tasks_v2beta3.CloudTasksClient()
+        self._cloud_tasks_client = cloud_tasks_client
 
     def _build_parent_path(self, queue_name: Optional[str] = None) -> str:
         if queue_name is None:
