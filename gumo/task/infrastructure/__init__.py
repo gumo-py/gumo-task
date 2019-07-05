@@ -81,6 +81,16 @@ class TaskConfiguration:
         if isinstance(self.cloud_tasks_location, CloudTaskLocation):
             return
 
+        if self.use_local_task_emulator:
+            self.cloud_tasks_location = CloudTaskLocation(
+                name='local',
+                location_id='local',
+                labels={
+                    'cloud.googleapis.com/region': 'local',
+                }
+            )
+            return
+
         if self._FALLBACK_CLOUD_TASKS_LOCATION in os.environ:
             self._set_cloud_tasks_location_on_fallback()
             return
