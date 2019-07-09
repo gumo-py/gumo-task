@@ -1,6 +1,21 @@
 version: '2.1'
 
 services:
+  python:
+    image: python:3.7.2-stretch
+    volumes:
+      - .:/work
+    working_dir: /work
+    depends_on:
+      - datastore_emulator
+      - datastore_emulator_test
+    environment:
+      DATASTORE_EMULATOR_HOST: datastore_emulator:8081
+      DATASTORE_EMULATOR_HOST_FOR_TEST: datastore_emulator_test:8082
+    ports:
+      - "8080:8080"
+    command: bash
+
   datastore_emulator:
     image: quay.io/gumo/datastore-emulator:v241
     environment:
