@@ -108,6 +108,9 @@ class TaskConfiguration:
             self._set_cloud_tasks_location()
             self._set_client()
 
+    def _has_fallback_location(self) -> bool:
+        return self._FALLBACK_CLOUD_TASKS_LOCATION in os.environ
+
     def _set_google_cloud_project(self):
         if isinstance(self.google_cloud_project, str):
             self.google_cloud_project = GoogleCloudProjectID(self.google_cloud_project)
@@ -131,26 +134,24 @@ class TaskConfiguration:
             self.cloud_tasks_location = CloudTaskLocation.build_local()
             return
 
-        if self._FALLBACK_CLOUD_TASKS_LOCATION in os.environ:
-            self._set_cloud_tasks_location_on_fallback()
+        if self._has_fallback_location():
+            location_id = os.environ[self._FALLBACK_CLOUD_TASKS_LOCATION]
+            logger.debug(f'Fallback to location={location_id} via env-vars "{self._FALLBACK_CLOUD_TASKS_LOCATION}"')
+            self.cloud_tasks_location = CloudTaskLocation.build_by(
+                project_id=self.google_cloud_project.value,
+                location_id=location_id,
+            )
             return
 
-        self.cloud_tasks_location = CloudTaskLocation.fetch_cloud_tasks_locations(google_cloud_project=self.google_cloud_project)
-
-    def _set_cloud_tasks_location_on_fallback(self):
-        location_id = os.environ[self._FALLBACK_CLOUD_TASKS_LOCATION]
-        logger.debug(f'Fallback to location={location_id} via env-vars "{self._FALLBACK_CLOUD_TASKS_LOCATION}"')
-
-        self.cloud_tasks_location = CloudTaskLocation.build_by(
-            project_id=self.google_cloud_project.value,
-            location_id=location_id,
+        self.cloud_tasks_location = CloudTaskLocation.fetch_cloud_tasks_locations(
+            google_cloud_project=self.google_cloud_project
         )
 
     def _set_client(self):
         if isinstance(self.client, tasks.CloudTasksClient):
             return
 
-        if self.use_local_task_emulator:
+        if self.use_local_task_emulator or self._has_fallback_location():
             return
 
         self.client = tasks.CloudTasksClient()

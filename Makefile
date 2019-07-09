@@ -44,8 +44,6 @@ pip-compile:
 	pip3 install --ignore-installed -r requirements.txt
 
 
-export DATASTORE_EMULATOR_HOST := 127.0.0.1:8082
-
 .PHONY: test
 test: build
 	pip3 install dist/${package_name}*.tar.gz

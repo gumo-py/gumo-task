@@ -17,3 +17,12 @@ class GumoTask:
     schedule_time: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.utcnow)
     created_at: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.utcnow)
     queue_name: Optional[str] = None
+
+    def _clone(self, **changes):
+        """
+        :rtype: GumoTask
+        """
+        return dataclasses.replace(self, **changes)
+
+    def with_queue_name(self, queue_name: str):
+        return self._clone(queue_name=queue_name)

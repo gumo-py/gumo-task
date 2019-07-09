@@ -9,7 +9,6 @@ from gumo.task.domain import GumoTask
 
 from gumo.task.application.factory import GumoTaskFactory
 from gumo.task.application.repository import GumoTaskRepository
-from gumo.task.infrastructure.configuration import TaskConfiguration
 
 logger = getLogger(__name__)
 
@@ -18,11 +17,9 @@ class CloudTasksEnqueueService:
     @inject
     def __init__(
             self,
-            task_configuration: TaskConfiguration,
             gumo_task_factory: GumoTaskFactory,
             gumo_task_repository: GumoTaskRepository,
     ):
-        self._task_configuration = task_configuration
         self._gumo_task_factory = gumo_task_factory
         self._gumo_task_repository = gumo_task_repository
 
@@ -35,13 +32,6 @@ class CloudTasksEnqueueService:
             in_seconds: Optional[int] = None,
             queue_name: Optional[str] = None,
     ) -> GumoTask:
-        if queue_name is None:
-            task_config = injector.get(TaskConfiguration)  # type: TaskConfiguration
-            queue_name = task_config.default_queue_name
-
-        if queue_name is None:
-            raise ValueError(f'queue_name is not defined.')
-
         task = self._gumo_task_factory.build_for_new(
             relative_uri=url,
             method=method,

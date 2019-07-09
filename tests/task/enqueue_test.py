@@ -1,8 +1,6 @@
 import datetime
 
-from gumo.core.injector import injector
 from gumo.task.application import enqueue
-from gumo.task.infrastructure.configuration import TaskConfiguration
 from gumo.task.domain import GumoTask
 
 from gumo.datastore.infrastructure.test_utils import DatastoreRepositoryMixinForTest
@@ -13,9 +11,6 @@ class TestEnqueServiceWithEmulator(DatastoreRepositoryMixinForTest, DatastoreMap
     KIND = GumoTask.KIND
 
     def setup_method(self):
-        task_configuration = injector.get(TaskConfiguration)
-        task_configuration.use_local_task_emulator = True
-
         self.cleanup_entities()
 
     def test_enqueue_success(self):
