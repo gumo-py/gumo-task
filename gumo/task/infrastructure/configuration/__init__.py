@@ -5,6 +5,7 @@ import threading
 from typing import ClassVar
 from typing import Optional
 from typing import Union
+from typing import List
 from logging import getLogger
 
 
@@ -15,37 +16,73 @@ from gumo.core import get_google_oauth_credential
 logger = getLogger(__name__)
 
 
+def _fetch_cloud_tasks_locations_by_api(google_cloud_project: GoogleCloudProjectID) -> List[dict]:
+    name = 'projects/{}'.format(google_cloud_project.value)
+    service = discovery.build(
+        'cloudtasks', 'v2',
+        credentials=get_google_oauth_credential(),
+        cache_discovery=False)
+    request = service.projects().locations().list(name=name)
+
+    response = request.execute()
+    locations = response.get('locations', [])
+    return locations
+
+
 @dataclasses.dataclass(frozen=True)
 class CloudTaskLocation:
     name: str
     location_id: str
     labels: dict = dataclasses.field(default_factory=dict)
 
+    @classmethod
+    def build_local(cls):
+        """
+        :rtype: CloudTaskLocation
+        """
+        return cls(
+            name='local',
+            location_id='local',
+            labels={
+                'cloud.googleapis.com/region': 'local',
+            }
+        )
 
-def _get_cloud_tasks_locations(google_cloud_project: GoogleCloudProjectID) -> Optional[CloudTaskLocation]:
-    name = 'projects/{}'.format(google_cloud_project.value)
-    service = discovery.build('cloudtasks', 'v2',
-                              credentials=get_google_oauth_credential(),
-                              cache_discovery=False)
-    request = service.projects().locations().list(name=name)
+    @classmethod
+    def build_by(cls, project_id: str, location_id: str):
+        """
+        :rtype: CloudTaskLocation
+        """
+        return cls(
+            name='projects/{project_id}/locations/{location_id}'.format(
+                project_id=project_id,
+                location_id=location_id,
+            ),
+            location_id=location_id,
+            labels={
+                'cloud.googleapis.com/region': location_id,
+            }
+        )
 
-    response = request.execute()
-    locations = response.get('locations', [])
+    @classmethod
+    def fetch_cloud_tasks_locations(cls, google_cloud_project: GoogleCloudProjectID):
+        """
+        :rtype: CloudTaskLocation
+        """
+        locations = _fetch_cloud_tasks_locations_by_api(google_cloud_project=google_cloud_project)
+        if len(locations) == 0:
+            raise RuntimeError(f'Cloud not found Cloud Tasks active locations (project={google_cloud_project.value}).')
 
-    if len(locations) == 0:
-        logger.warning(f'Cloud not found Cloud Tasks active locations ({name}).')
-        return
+        if len(locations) > 1:
+            logger.warning(f'Cloud Tasks active locations are too many found. Use first record of results.')
 
-    if len(locations) > 1:
-        logger.warning(f'Cloud Tasks active locations are too many found. Use first record of results.')
+        location = locations[0]  # type: dict
 
-    location = locations[0]  # type: dict
-
-    return CloudTaskLocation(
-        name=location.get('name'),
-        location_id=location.get('locationId'),
-        labels=location.get('labels')
-    )
+        return CloudTaskLocation(
+            name=location.get('name'),
+            location_id=location.get('locationId'),
+            labels=location.get('labels')
+        )
 
 
 @dataclasses.dataclass()
@@ -88,32 +125,20 @@ class TaskConfiguration:
             return
 
         if self.use_local_task_emulator:
-            self.cloud_tasks_location = CloudTaskLocation(
-                name='local',
-                location_id='local',
-                labels={
-                    'cloud.googleapis.com/region': 'local',
-                }
-            )
+            self.cloud_tasks_location = CloudTaskLocation.build_local()
             return
 
         if self._FALLBACK_CLOUD_TASKS_LOCATION in os.environ:
             self._set_cloud_tasks_location_on_fallback()
             return
 
-        self.cloud_tasks_location = _get_cloud_tasks_locations(google_cloud_project=self.google_cloud_project)
+        self.cloud_tasks_location = CloudTaskLocation.fetch_cloud_tasks_locations(google_cloud_project=self.google_cloud_project)
 
     def _set_cloud_tasks_location_on_fallback(self):
         location_id = os.environ[self._FALLBACK_CLOUD_TASKS_LOCATION]
         logger.debug(f'Fallback to location={location_id} via env-vars "{self._FALLBACK_CLOUD_TASKS_LOCATION}"')
 
-        self.cloud_tasks_location = CloudTaskLocation(
-            name='projects/{project_id}/locations/{location_id}'.format(
-                project_id=self.google_cloud_project.value,
-                location_id=location_id,
-            ),
+        self.cloud_tasks_location = CloudTaskLocation.build_by(
+            project_id=self.google_cloud_project.value,
             location_id=location_id,
-            labels={
-                'cloud.googleapis.com/region': location_id,
-            }
         )
