@@ -7,7 +7,7 @@ from google.cloud import tasks
 from google.protobuf import timestamp_pb2
 
 from gumo.core import GumoConfiguration
-from gumo.task.infrastructure import TaskConfiguration
+from gumo.task.infrastructure.configuration import TaskConfiguration
 from gumo.task.domain import GumoTask
 
 logger = getLogger(__name__)

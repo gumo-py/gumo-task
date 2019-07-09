@@ -9,7 +9,7 @@ from gumo.task.domain import GumoTask
 
 from gumo.task.application.factory import GumoTaskFactory
 from gumo.task.application.repository import GumoTaskRepository
-from gumo.task.infrastructure import TaskConfiguration
+from gumo.task.infrastructure.configuration import TaskConfiguration
 
 logger = getLogger(__name__)
 

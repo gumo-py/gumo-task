@@ -4,7 +4,7 @@ from injector import Injector
 from injector import singleton
 
 from gumo.task._configuration import ConfigurationFactory
-from gumo.task.infrastructure import TaskConfiguration
+from gumo.task.infrastructure.configuration import TaskConfiguration
 
 
 def test_configuration_factory_build():

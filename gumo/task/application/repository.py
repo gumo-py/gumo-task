@@ -2,7 +2,7 @@ from injector import inject
 
 from typing import Optional
 
-from gumo.task.infrastructure import TaskConfiguration
+from gumo.task.infrastructure.configuration import TaskConfiguration
 from gumo.task.domain import GumoTask
 
 

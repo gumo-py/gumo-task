@@ -2,7 +2,7 @@ import datetime
 
 from gumo.core.injector import injector
 from gumo.task.application import enqueue
-from gumo.task.infrastructure import TaskConfiguration
+from gumo.task.infrastructure.configuration import TaskConfiguration
 from gumo.task.domain import GumoTask
 
 from gumo.datastore.infrastructure.test_utils import DatastoreRepositoryMixinForTest

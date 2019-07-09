@@ -7,7 +7,7 @@ from typing import Optional
 from google.cloud import tasks
 
 from gumo.core.injector import injector
-from gumo.task.infrastructure import TaskConfiguration
+from gumo.task.infrastructure.configuration import TaskConfiguration
 from gumo.task.bind import task_bind
 
 
