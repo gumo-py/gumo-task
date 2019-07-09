@@ -1,7 +1,6 @@
 import flask
 import logging
 import sys
-import os
 import datetime
 
 from gumo.core import configure as core_configure
@@ -16,16 +15,9 @@ logger = logging.getLogger(__name__)
 DEFAULT_QUEUE_NAME = 'gumo-task-test-queue'
 DELAYED_QUEUE_NAME = 'gumo-task-delayed-test-queue'
 
-core_configure(
-    google_cloud_project=os.environ['GOOGLE_CLOUD_PROJECT'],
-    google_cloud_location='us-central1',
-)
+core_configure()
 
-datastore_configure(
-    use_local_emulator=False,
-    emulator_host=None,
-    namespace=None,
-)
+datastore_configure()
 
 task_configure(
     default_queue_name=DEFAULT_QUEUE_NAME,
