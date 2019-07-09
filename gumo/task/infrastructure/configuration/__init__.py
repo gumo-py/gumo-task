@@ -8,10 +8,11 @@ from typing import Union
 from typing import List
 from logging import getLogger
 
-
 from googleapiclient import discovery
 from gumo.core import GoogleCloudProjectID
 from gumo.core import get_google_oauth_credential
+
+from google.cloud import tasks
 
 logger = getLogger(__name__)
 
@@ -92,6 +93,7 @@ class TaskConfiguration:
     google_cloud_project: Union[GoogleCloudProjectID, str, None] = None
     gae_service_name: Optional[str] = None
     cloud_tasks_location: Optional[CloudTaskLocation] = None
+    client: Optional[tasks.CloudTasksClient] = None
 
     _GOOGLE_CLOUD_PROJECT_ENV_KEY: ClassVar = 'GOOGLE_CLOUD_PROJECT'
     _GAE_SERVICE_ENV_KEY: ClassVar = 'GAE_SERVICE'
@@ -104,6 +106,7 @@ class TaskConfiguration:
             self._set_google_cloud_project()
             self._set_gae_service_name()
             self._set_cloud_tasks_location()
+            self._set_client()
 
     def _set_google_cloud_project(self):
         if isinstance(self.google_cloud_project, str):
@@ -142,3 +145,12 @@ class TaskConfiguration:
             project_id=self.google_cloud_project.value,
             location_id=location_id,
         )
+
+    def _set_client(self):
+        if isinstance(self.client, tasks.CloudTasksClient):
+            return
+
+        if self.use_local_task_emulator:
+            return
+
+        self.client = tasks.CloudTasksClient()
