@@ -12,9 +12,14 @@ from googleapiclient import discovery
 from gumo.core import GoogleCloudProjectID
 from gumo.core import get_google_oauth_credential
 
-from gumo.task.domain.configuration import CloudTaskLocation
-
 logger = getLogger(__name__)
+
+
+@dataclasses.dataclass(frozen=True)
+class CloudTaskLocation:
+    name: str
+    location_id: str
+    labels: dict = dataclasses.field(default_factory=dict)
 
 
 def _get_cloud_tasks_locations(google_cloud_project: GoogleCloudProjectID) -> Optional[CloudTaskLocation]:
