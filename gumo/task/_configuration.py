@@ -17,9 +17,9 @@ class ConfigurationFactory:
     def build(
             cls,
             default_queue_name: Optional[str] = None,
-            use_local_task_emulator: Union[str, bool, None] = False
+            use_local_task_emulator: Union[str, bool, None] = None
     ) -> TaskConfiguration:
-        use_emulator = False
+        use_emulator = None
 
         if isinstance(use_local_task_emulator, bool):
             use_emulator = use_local_task_emulator
@@ -34,7 +34,7 @@ class ConfigurationFactory:
 
 def configure(
         default_queue_name: Optional[str] = None,
-        use_local_task_emulator: Union[str, bool, None] = False
+        use_local_task_emulator: Union[str, bool, None] = None
 ) -> TaskConfiguration:
     config = ConfigurationFactory.build(
         default_queue_name=default_queue_name,

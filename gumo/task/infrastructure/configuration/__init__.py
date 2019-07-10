@@ -50,22 +50,6 @@ class CloudTaskLocation:
         )
 
     @classmethod
-    def build_by(cls, project_id: str, location_id: str):
-        """
-        :rtype: CloudTaskLocation
-        """
-        return cls(
-            name='projects/{project_id}/locations/{location_id}'.format(
-                project_id=project_id,
-                location_id=location_id,
-            ),
-            location_id=location_id,
-            labels={
-                'cloud.googleapis.com/region': location_id,
-            }
-        )
-
-    @classmethod
     def fetch_cloud_tasks_locations(cls, google_cloud_project: GoogleCloudProjectID):
         """
         :rtype: CloudTaskLocation
@@ -97,7 +81,9 @@ class TaskConfiguration:
 
     _ENV_KEY_GOOGLE_CLOUD_PROJECT: ClassVar = 'GOOGLE_CLOUD_PROJECT'
     _ENV_KEY_GAE_SERVICE: ClassVar = 'GAE_SERVICE'
-    _ENV_KEY_FALLBACK_CLOUD_TASKS_LOCATION: ClassVar = '_FALLBACK_CLOUD_TASKS_LOCATION'
+    _ENV_KEY_GAE_DEPLOYMENT_ID: ClassVar = 'GAE_DEPLOYMENT_ID'
+    _ENV_KEY_GAE_INSTANCE: ClassVar = 'GAE_INSTANCE'
+    _ENV_KEY_CLOUD_TASKS_EMULATOR_ENABLED: ClassVar = 'CLOUD_TASKS_EMULATOR_ENABLED'
 
     _lock: ClassVar = threading.Lock()
 
@@ -105,11 +91,15 @@ class TaskConfiguration:
         with self._lock:
             self._set_google_cloud_project()
             self._set_gae_service_name()
+            self._set_use_local_task_emulator()
             self._set_cloud_tasks_location()
             self._set_client()
 
-    def _has_fallback_location(self) -> bool:
-        return self._ENV_KEY_FALLBACK_CLOUD_TASKS_LOCATION in os.environ
+    def _cloud_tasks_emulator_enabled(self) -> bool:
+        return os.environ.get(self._ENV_KEY_CLOUD_TASKS_EMULATOR_ENABLED, '').lower() == 'true'
+
+    def _is_google_platform(self) -> bool:
+        return self._ENV_KEY_GAE_DEPLOYMENT_ID in os.environ and self._ENV_KEY_GAE_INSTANCE in os.environ
 
     def _set_google_cloud_project(self):
         if isinstance(self.google_cloud_project, str):
@@ -126,23 +116,24 @@ class TaskConfiguration:
         if self.gae_service_name is None and self._ENV_KEY_GAE_SERVICE in os.environ:
             self.gae_service_name = os.environ[self._ENV_KEY_GAE_SERVICE]
 
+    def _set_use_local_task_emulator(self):
+        if isinstance(self.use_local_task_emulator, bool):
+            return
+
+        if self._is_google_platform():
+            self.use_local_task_emulator = False
+            return
+
+        if self._cloud_tasks_emulator_enabled():
+            self.use_local_task_emulator = True
+            return
+
     def _set_cloud_tasks_location(self):
         if isinstance(self.cloud_tasks_location, CloudTaskLocation):
             return
 
         if self.use_local_task_emulator:
             self.cloud_tasks_location = CloudTaskLocation.build_local()
-            return
-
-        if self._has_fallback_location():
-            location_id = os.environ[self._ENV_KEY_FALLBACK_CLOUD_TASKS_LOCATION]
-            logger.debug(
-                f'Fallback to location={location_id} via env-vars "{self._ENV_KEY_FALLBACK_CLOUD_TASKS_LOCATION}"'
-            )
-            self.cloud_tasks_location = CloudTaskLocation.build_by(
-                project_id=self.google_cloud_project.value,
-                location_id=location_id,
-            )
             return
 
         self.cloud_tasks_location = CloudTaskLocation.fetch_cloud_tasks_locations(
@@ -153,7 +144,7 @@ class TaskConfiguration:
         if isinstance(self.client, tasks.CloudTasksClient):
             return
 
-        if self.use_local_task_emulator or self._has_fallback_location():
+        if self.use_local_task_emulator:
             return
 
         self.client = tasks.CloudTasksClient()

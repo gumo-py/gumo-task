@@ -12,7 +12,7 @@ if os.environ.get('DATASTORE_EMULATOR_HOST_FOR_TEST'):
 elif os.environ.get('DATASTORE_EMULATOR_HOST') is None:
     os.environ['DATASTORE_EMULATOR_HOST'] = '127.0.0.1:8082'
 
-os.environ['_FALLBACK_CLOUD_TASKS_LOCATION'] = 'us-central1'
+os.environ['CLOUD_TASKS_EMULATOR_ENABLED'] = 'true'
 
 core_configure()
 
@@ -20,5 +20,4 @@ datastore_configure()
 
 task_configure(
     default_queue_name='gumo-default-queue',
-    use_local_task_emulator=True,
 )

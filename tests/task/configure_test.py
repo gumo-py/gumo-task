@@ -49,7 +49,7 @@ class TestConfiguration:
             os.environ[k] = v
 
     def test_use_emulator(self):
-        del os.environ['_FALLBACK_CLOUD_TASKS_LOCATION']
+        del os.environ['CLOUD_TASKS_EMULATOR_ENABLED']
 
         o = ConfigurationFactory.build(
             default_queue_name='default',
