@@ -57,6 +57,6 @@ emulator-stop:
 	docker-compose stop
 
 
-.PHONY: sample-app-deploy
-sample-app-deploy:
+.PHONY: deploy-sample-app
+deploy-sample-app:
 	gcloud app deploy sample/app.yaml --project=gumo-example --quiet
