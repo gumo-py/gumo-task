@@ -12,6 +12,7 @@ services:
     environment:
       DATASTORE_EMULATOR_HOST: datastore_emulator:8081
       DATASTORE_EMULATOR_HOST_FOR_TEST: datastore_emulator_test:8082
+      CLOUD_TASKS_EMULATOR_ENABLED: 'true'
     ports:
       - "8080:8080"
     command: bash

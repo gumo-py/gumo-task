@@ -2,6 +2,7 @@ import flask
 import logging
 import sys
 import datetime
+import os
 
 from gumo.core import configure as core_configure
 from gumo.datastore import configure as datastore_configure
@@ -10,6 +11,9 @@ from gumo.task import enqueue
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+if os.environ.get('GOOGLE_CLOUD_PROJECT') is None:
+    os.environ['GOOGLE_CLOUD_PROJECT'] = 'gumo-example'
 
 # gcloud tasks queues create [QUEUE_ID]
 DEFAULT_QUEUE_NAME = 'gumo-task-test-queue'
@@ -21,7 +25,6 @@ datastore_configure()
 
 task_configure(
     default_queue_name=DEFAULT_QUEUE_NAME,
-    use_local_task_emulator=False,
 )
 
 app = flask.Flask(__name__)
