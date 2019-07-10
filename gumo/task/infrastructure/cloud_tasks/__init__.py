@@ -13,13 +13,17 @@ logger = getLogger(__name__)
 
 
 class CloudTasksPayloadFactory:
+    DEFAULT_SERVICE_NAME = 'default'
+
     def __init__(
             self,
             parent: str,
             task: GumoTask,
+            gae_service_name: str,
     ):
         self._parent = parent
         self._task = task
+        self._gae_service_name = gae_service_name
 
     def _payload_as_bytes(self) -> str:
         return json.dumps(self._task.payload, ensure_ascii=False).encode('utf-8')
@@ -34,6 +38,12 @@ class CloudTasksPayloadFactory:
             'http_method': self._task.method,
             'relative_uri': self._task.relative_uri,
         }
+
+        if self._gae_service_name and self._gae_service_name != self.DEFAULT_SERVICE_NAME:
+            # TODO: Consider switching between specific version patterns and default version patterns.
+            app_engine_http_request['app_engine_routing'] = {
+                'service': self._gae_service_name
+            }
 
         if self._task.payload is not None:
             app_engine_http_request['body'] = self._payload_as_bytes()
@@ -77,7 +87,11 @@ class CloudTasksRepository:
             raise RuntimeError(f'CloudTasksClient does not configured.')
 
         parent = self._build_parent_path(queue_name=queue_name)
-        task_dict = CloudTasksPayloadFactory(parent=parent, task=task).build()
+        task_dict = CloudTasksPayloadFactory(
+            parent=parent,
+            task=task,
+            gae_service_name=self._task_configuration.gae_service_name,
+        ).build()
 
         logger.debug(f'Create task parent={parent}, task={task_dict}')
 
