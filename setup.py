@@ -5,8 +5,8 @@ name = 'gumo-task'
 version = '0.1.0a2'
 description = 'Gumo Task Library'
 dependencies = [
-    'gumo-core >= 0.1.0a6',
-    'gumo-datastore >= 0.1.0a1',
+    'gumo-core >= 0.1.0a7',
+    'gumo-datastore >= 0.1.0a3',
     'google-cloud-tasks >= 1.1.0',
 ]
 
