@@ -8,3 +8,6 @@ __all__ = [
     TaskConfiguration.__name__,
     enqueue.__name__,
 ]
+
+
+configure()
