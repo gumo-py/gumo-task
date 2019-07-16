@@ -1,5 +1,4 @@
 flask
-gumo-core
-gumo-datastore
-gumo-task
-injector==0.15.0
+gumo-core==0.1.0a7
+gumo-datastore==0.1.0a3
+injector

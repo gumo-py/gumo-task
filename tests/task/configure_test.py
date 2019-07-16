@@ -4,7 +4,7 @@ from injector import Injector
 from injector import singleton
 
 from gumo.task._configuration import ConfigurationFactory
-from gumo.task.infrastructure import TaskConfiguration
+from gumo.task.infrastructure.configuration import TaskConfiguration
 
 
 def test_configuration_factory_build():
@@ -18,23 +18,10 @@ def test_configuration_factory_build():
         use_local_task_emulator=True,
     )
 
-    assert ConfigurationFactory.build(
-        default_queue_name='gumo-default-queue',
-        use_local_task_emulator='yes',
-    ).use_local_task_emulator
-    assert ConfigurationFactory.build(
-        default_queue_name='gumo-default-queue',
-        use_local_task_emulator='true',
-    ).use_local_task_emulator
-    assert not ConfigurationFactory.build(
-        default_queue_name='gumo-default-queue',
-        use_local_task_emulator='no',
-    ).use_local_task_emulator
-
 
 def test_singleton_task_configuration():
     injector = Injector()
-    config = TaskConfiguration()
+    config = TaskConfiguration(use_local_task_emulator=True)
     injector.binder.bind(TaskConfiguration, to=config, scope=singleton)
     fetched_config = injector.get(TaskConfiguration)
 
@@ -62,7 +49,7 @@ class TestConfiguration:
             os.environ[k] = v
 
     def test_use_emulator(self):
-        del os.environ['_FALLBACK_CLOUD_TASKS_LOCATION']
+        del os.environ['CLOUD_TASKS_EMULATOR_ENABLED']
 
         o = ConfigurationFactory.build(
             default_queue_name='default',

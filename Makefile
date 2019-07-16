@@ -44,12 +44,10 @@ pip-compile:
 	pip3 install --ignore-installed -r requirements.txt
 
 
-export DATASTORE_EMULATOR_HOST := 127.0.0.1:8082
-
 .PHONY: test
 test: build
 	pip3 install dist/${package_name}*.tar.gz
-	pytest -v --junit-xml=test-reports/results.xml tests/config.py tests
+	./tests/run.sh
 
 .PHONY: emulator-start emulator-stop
 emulator-start:
@@ -57,3 +55,8 @@ emulator-start:
 
 emulator-stop:
 	docker-compose stop
+
+
+.PHONY: deploy-sample-app
+deploy-sample-app:
+	gcloud app deploy sample/app.yaml --project=gumo-example --quiet

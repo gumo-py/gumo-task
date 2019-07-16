@@ -6,21 +6,24 @@ from typing import Optional
 from google.cloud import tasks
 from google.protobuf import timestamp_pb2
 
-from gumo.core import GumoConfiguration
-from gumo.task.infrastructure import TaskConfiguration
+from gumo.task.infrastructure.configuration import TaskConfiguration
 from gumo.task.domain import GumoTask
 
 logger = getLogger(__name__)
 
 
 class CloudTasksPayloadFactory:
+    DEFAULT_SERVICE_NAME = 'default'
+
     def __init__(
             self,
             parent: str,
             task: GumoTask,
+            gae_service_name: str,
     ):
         self._parent = parent
         self._task = task
+        self._gae_service_name = gae_service_name
 
     def _payload_as_bytes(self) -> str:
         return json.dumps(self._task.payload, ensure_ascii=False).encode('utf-8')
@@ -35,6 +38,12 @@ class CloudTasksPayloadFactory:
             'http_method': self._task.method,
             'relative_uri': self._task.relative_uri,
         }
+
+        if self._gae_service_name and self._gae_service_name != self.DEFAULT_SERVICE_NAME:
+            # TODO: Consider switching between specific version patterns and default version patterns.
+            app_engine_http_request['app_engine_routing'] = {
+                'service': self._gae_service_name
+            }
 
         if self._task.payload is not None:
             app_engine_http_request['body'] = self._payload_as_bytes()
@@ -54,21 +63,18 @@ class CloudTasksRepository:
     @inject
     def __init__(
             self,
-            gumo_configuration: GumoConfiguration,
             task_configuration: TaskConfiguration,
-            cloud_tasks_client: tasks.CloudTasksClient,
     ):
-        self._gumo_configuration = gumo_configuration
         self._task_configuration = task_configuration
-        self._cloud_tasks_client = cloud_tasks_client
+        self._cloud_tasks_client: tasks.CloudTasksClient = self._task_configuration.client
 
     def _build_parent_path(self, queue_name: Optional[str] = None) -> str:
         if queue_name is None:
             queue_name = self._task_configuration.default_queue_name
 
         return self._cloud_tasks_client.queue_path(
-            project=self._gumo_configuration.google_cloud_project.value,
-            location=self._gumo_configuration.google_cloud_location.value,
+            project=self._task_configuration.google_cloud_project.value,
+            location=self._task_configuration.cloud_tasks_location.location_id,
             queue=queue_name,
         )
 
@@ -77,8 +83,15 @@ class CloudTasksRepository:
             task: GumoTask,
             queue_name: Optional[str] = None
     ):
+        if self._cloud_tasks_client is None:
+            raise RuntimeError(f'CloudTasksClient does not configured.')
+
         parent = self._build_parent_path(queue_name=queue_name)
-        task_dict = CloudTasksPayloadFactory(parent=parent, task=task).build()
+        task_dict = CloudTasksPayloadFactory(
+            parent=parent,
+            task=task,
+            gae_service_name=self._task_configuration.gae_service_name,
+        ).build()
 
         logger.debug(f'Create task parent={parent}, task={task_dict}')
 

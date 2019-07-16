@@ -4,23 +4,20 @@ from gumo.core import configure as core_configure
 from gumo.datastore import configure as datastore_configure
 from gumo.task import configure as task_configure
 
-if os.environ.get('GOOGLE_APPLICATION_CREDENTIALS') is None:
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/path/to/credential.json'
+if os.environ.get('GOOGLE_CLOUD_PROJECT') is None:
+    os.environ['GOOGLE_CLOUD_PROJECT'] = 'gumo-task'
 
-os.environ['_FALLBACK_CLOUD_TASKS_LOCATION'] = 'us-central1'
+if os.environ.get('DATASTORE_EMULATOR_HOST_FOR_TEST'):
+    os.environ['DATASTORE_EMULATOR_HOST'] = os.environ['DATASTORE_EMULATOR_HOST_FOR_TEST']
+elif os.environ.get('DATASTORE_EMULATOR_HOST') is None:
+    os.environ['DATASTORE_EMULATOR_HOST'] = '127.0.0.1:8082'
 
-core_configure(
-    google_cloud_project='gumo-task',
-    google_cloud_location='asia-northeast1',
-)
+os.environ['CLOUD_TASKS_EMULATOR_ENABLED'] = 'true'
 
-datastore_configure(
-    use_local_emulator=True,
-    emulator_host=os.environ.get('DATASTORE_EMULATOR_HOST', 'datastore_emulator:8081'),
-    namespace=None,
-)
+core_configure()
+
+datastore_configure()
 
 task_configure(
     default_queue_name='gumo-default-queue',
-    use_local_task_emulator=True,
 )

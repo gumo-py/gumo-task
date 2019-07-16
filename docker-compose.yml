@@ -1,6 +1,22 @@
 version: '2.1'
 
 services:
+  python:
+    image: python:3.7.2-stretch
+    volumes:
+      - .:/work
+    working_dir: /work
+    depends_on:
+      - datastore_emulator
+      - datastore_emulator_test
+    environment:
+      DATASTORE_EMULATOR_HOST: datastore_emulator:8081
+      DATASTORE_EMULATOR_HOST_FOR_TEST: datastore_emulator_test:8082
+      CLOUD_TASKS_EMULATOR_ENABLED: 'true'
+    ports:
+      - "8080:8080"
+    command: bash
+
   datastore_emulator:
     image: quay.io/gumo/datastore-emulator:v241
     environment:
@@ -18,3 +34,17 @@ services:
     ports:
       - "8082:8082"
     command: --no-store-on-disk --consistency=1
+
+  datastore_viewer:
+    image: python:3.7.2-stretch
+    environment:
+      DATASTORE_VIEWER_HOST: 0.0.0.0
+      DATASTORE_VIEWER_PORT: 8091
+      DATASTORE_EMULATOR_HOST: datastore_emulator:8081
+    command: |
+      bash -ex -c "
+      pip install --upgrade datastore-viewer
+      datastore-viewer
+      "
+    ports:
+      - "8091:8091"

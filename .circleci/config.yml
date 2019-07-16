@@ -3,15 +3,14 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.7.2
+        environment:
+          GOOGLE_CLOUD_PROJECT: gumo-task
+          DATASTORE_EMULATOR_HOST: 127.0.0.1:8082
       - image: quay.io/gumo/datastore-emulator:v241
         command: --no-store-on-disk --consistency=1
         environment:
-          GOOGLE_CLOUD_PROJECT: gumo-task
           DATASTORE_PROJECT_ID: gumo-task
           DATASTORE_LISTEN_ADDRESS: 0.0.0.0:8082
-
-    environment:
-      GOOGLE_APPLICATION_CREDENTIALS: credentials/service-account.json
 
     working_directory: ~/repo
 
@@ -38,12 +37,6 @@ jobs:
           paths:
             - ./venv
           key: 20190628-00-dependencies-{{ checksum "requirements.txt" }}
-
-      - run:
-          name: prepare credentials
-          command: |
-            mkdir -p $(dirname $GOOGLE_APPLICATION_CREDENTIALS)
-            echo $GOOGLE_SERVICE_ACCOUNT_EMPTY_ROLE_CREDENTIAL_CONTENT > $GOOGLE_APPLICATION_CREDENTIALS
 
       - run:
           name: check requirements.txt

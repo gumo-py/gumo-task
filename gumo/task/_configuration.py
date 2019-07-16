@@ -4,10 +4,8 @@ from injector import singleton
 from typing import Union
 from typing import Optional
 
-from google.cloud import tasks
-
 from gumo.core.injector import injector
-from gumo.task.infrastructure import TaskConfiguration
+from gumo.task.infrastructure.configuration import TaskConfiguration
 from gumo.task.bind import task_bind
 
 
@@ -19,9 +17,9 @@ class ConfigurationFactory:
     def build(
             cls,
             default_queue_name: Optional[str] = None,
-            use_local_task_emulator: Union[str, bool, None] = False
+            use_local_task_emulator: Union[str, bool, None] = None
     ) -> TaskConfiguration:
-        use_emulator = False
+        use_emulator = None
 
         if isinstance(use_local_task_emulator, bool):
             use_emulator = use_local_task_emulator
@@ -36,7 +34,7 @@ class ConfigurationFactory:
 
 def configure(
         default_queue_name: Optional[str] = None,
-        use_local_task_emulator: Union[str, bool, None] = False
+        use_local_task_emulator: Union[str, bool, None] = None
 ) -> TaskConfiguration:
     config = ConfigurationFactory.build(
         default_queue_name=default_queue_name,
@@ -46,6 +44,5 @@ def configure(
 
     injector.binder.bind(TaskConfiguration, to=config, scope=singleton)
     injector.binder.install(task_bind)
-    injector.binder.bind(tasks.CloudTasksClient, to=tasks.CloudTasksClient(), scope=singleton)
 
     return config
