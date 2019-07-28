@@ -106,4 +106,3 @@ class TestSuitableVersionName:
             hostname='version.service.gumo-sample.appspot.com',
             service_name='service'
         ) == 'version'
-
