@@ -27,7 +27,7 @@ class CloudTasksPayloadFactory:
         self._gae_service_name = gae_service_name
         self._gae_version_name = gae_version_name
 
-    def _payload_as_bytes(self) -> str:
+    def _payload_as_json_bytes(self) -> str:
         return json.dumps(self._task.payload, ensure_ascii=False).encode('utf-8')
 
     def _schedule_time_as_pb(self) -> timestamp_pb2.Timestamp:
@@ -53,7 +53,10 @@ class CloudTasksPayloadFactory:
         }
 
         if self._task.payload is not None:
-            app_engine_http_request['body'] = self._payload_as_bytes()
+            app_engine_http_request['body'] = self._payload_as_json_bytes()
+            app_engine_http_request['headers'] = {
+                'Content-Type': 'application/json'
+            }
 
         task_dict = {
             'app_engine_http_request': app_engine_http_request,
