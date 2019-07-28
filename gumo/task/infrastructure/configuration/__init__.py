@@ -173,6 +173,9 @@ class TaskConfiguration:
         self.client = tasks.CloudTasksClient()
 
     def suitable_version_name(self, hostname: str) -> Optional[str]:
+        if hostname is None:
+            return
+
         return _detect_suitable_version_name(
             hostname=hostname,
             service_name=self.gae_service_name,
