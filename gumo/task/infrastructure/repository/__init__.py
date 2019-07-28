@@ -1,3 +1,5 @@
+import os
+
 from logging import getLogger
 
 from injector import inject
@@ -48,7 +50,11 @@ class GumoTaskRepositoryImpl(GumoTaskRepository, DatastoreRepositoryMixin):
             queue_name: Optional[str] = None
     ):
         logger.debug(f'Use Cloud Tasks API (task={task}, queue_name={queue_name})')
-        self._cloud_tasks_repository.enqueue(task=task, queue_name=queue_name)
+        self._cloud_tasks_repository.enqueue(
+            task=task,
+            queue_name=queue_name,
+            hostname=os.environ.get('HTTP_HOST')
+        )
 
     def _enqueue_to_local_emulator(
             self,
