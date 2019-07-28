@@ -5,6 +5,7 @@ from injector import singleton
 
 from gumo.task._configuration import ConfigurationFactory
 from gumo.task.infrastructure.configuration import TaskConfiguration
+from gumo.task.infrastructure.configuration import _detect_suitable_version_name
 
 
 def test_configuration_factory_build():
@@ -58,3 +59,51 @@ class TestConfiguration:
 
         assert o.cloud_tasks_location.name == 'local'
         assert o.cloud_tasks_location.location_id == 'local'
+
+
+class TestSuitableVersionName:
+    def test_default_url(self):
+        assert _detect_suitable_version_name(
+            hostname='gumo-sample.appspot.com',
+            service_name=None
+        ) is None
+
+    def test_custom_domain_url(self):
+        assert _detect_suitable_version_name(
+            hostname='app.balus.me',
+            service_name=None
+        ) is None
+
+    def test_with_version_url(self):
+        assert _detect_suitable_version_name(
+            hostname='version-dot-gumo-sample.appspot.com',
+            service_name=None
+        ) == 'version'
+
+        assert _detect_suitable_version_name(
+            hostname='version.gumo-sample.appspot.com',
+            service_name=None
+        ) == 'version'
+
+    def test_with_service_default_url(self):
+        assert _detect_suitable_version_name(
+            hostname='service-dot-gumo-sample.appspot.com',
+            service_name='service'
+        ) is None
+
+        assert _detect_suitable_version_name(
+            hostname='service.gumo-sample.appspot.com',
+            service_name='service'
+        ) is None
+
+    def test_with_service_specific_version_url(self):
+        assert _detect_suitable_version_name(
+            hostname='version-dot-service-dot-gumo-sample.appspot.com',
+            service_name='service'
+        ) == 'version'
+
+        assert _detect_suitable_version_name(
+            hostname='version.service.gumo-sample.appspot.com',
+            service_name='service'
+        ) == 'version'
+

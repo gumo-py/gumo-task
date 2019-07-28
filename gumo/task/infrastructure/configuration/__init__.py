@@ -17,6 +17,28 @@ from google.cloud import tasks
 logger = getLogger(__name__)
 
 
+def _detect_suitable_version_name(hostname: str, service_name: Optional[str]) -> Optional[str]:
+    if hostname.find('.appspot.com') < 0:
+        # custom domain url
+        return
+
+    subdomain = hostname.replace('.appspot.com', '').replace('-dot-', '.')
+    if subdomain.find('.') < 0:
+        # <app-id>.appspot.com style.
+        return
+
+    split = subdomain.split('.')
+    if len(split) == 2 and service_name == split[0]:
+        # <service>.<app-id>.appspot.com style.
+        return
+
+    if len(split) == 3 and service_name == split[1]:
+        # <version>.<service>.<app-id>.appspot.com style.
+        return split[0]
+
+    return split[0]
+
+
 def _fetch_cloud_tasks_locations_by_api(google_cloud_project: GoogleCloudProjectID) -> List[dict]:
     name = 'projects/{}'.format(google_cloud_project.value)
     service = discovery.build(
