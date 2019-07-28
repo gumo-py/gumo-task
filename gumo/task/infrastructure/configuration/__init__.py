@@ -98,6 +98,7 @@ class TaskConfiguration:
     use_local_task_emulator: bool = False
     google_cloud_project: Union[GoogleCloudProjectID, str, None] = None
     gae_service_name: Optional[str] = None
+    gae_version_name: Optional[str] = None
     cloud_tasks_location: Optional[CloudTaskLocation] = None
     client: Optional[tasks.CloudTasksClient] = None
 
@@ -170,3 +171,9 @@ class TaskConfiguration:
             return
 
         self.client = tasks.CloudTasksClient()
+
+    def suitable_version_name(self, hostname: str) -> Optional[str]:
+        return _detect_suitable_version_name(
+            hostname=hostname,
+            service_name=self.gae_service_name,
+        )

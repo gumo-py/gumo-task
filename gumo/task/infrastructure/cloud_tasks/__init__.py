@@ -19,11 +19,13 @@ class CloudTasksPayloadFactory:
             self,
             parent: str,
             task: GumoTask,
-            gae_service_name: str,
+            gae_service_name: Optional[str] = None,
+            gae_version_name: Optional[str] = None,
     ):
         self._parent = parent
         self._task = task
         self._gae_service_name = gae_service_name
+        self._gae_version_name = gae_version_name
 
     def _payload_as_bytes(self) -> str:
         return json.dumps(self._task.payload, ensure_ascii=False).encode('utf-8')
@@ -33,17 +35,22 @@ class CloudTasksPayloadFactory:
             seconds=int(self._task.schedule_time.timestamp())
         )
 
+    def _build_app_engine_routing(self) -> dict:
+        app_engine_routing = {}
+
+        if self._gae_service_name and self._gae_service_name != self.DEFAULT_SERVICE_NAME:
+            app_engine_routing['service'] = self._gae_service_name
+        if self._gae_service_name is not None:
+            app_engine_routing['version'] = self._gae_version_name
+
+        return app_engine_routing
+
     def build(self) -> dict:
         app_engine_http_request = {
             'http_method': self._task.method,
             'relative_uri': self._task.relative_uri,
+            'app_engine_routing': self._build_app_engine_routing()
         }
-
-        if self._gae_service_name and self._gae_service_name != self.DEFAULT_SERVICE_NAME:
-            # TODO: Consider switching between specific version patterns and default version patterns.
-            app_engine_http_request['app_engine_routing'] = {
-                'service': self._gae_service_name
-            }
 
         if self._task.payload is not None:
             app_engine_http_request['body'] = self._payload_as_bytes()
@@ -81,7 +88,8 @@ class CloudTasksRepository:
     def enqueue(
             self,
             task: GumoTask,
-            queue_name: Optional[str] = None
+            queue_name: Optional[str] = None,
+            hostname: Optional[str] = None,
     ):
         if self._cloud_tasks_client is None:
             raise RuntimeError(f'CloudTasksClient does not configured.')
@@ -91,6 +99,7 @@ class CloudTasksRepository:
             parent=parent,
             task=task,
             gae_service_name=self._task_configuration.gae_service_name,
+            gae_version_name=self._task_configuration.suitable_version_name(hostname=hostname),
         ).build()
 
         logger.debug(f'Create task parent={parent}, task={task_dict}')
