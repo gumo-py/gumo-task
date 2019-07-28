@@ -46,3 +46,7 @@ def configure(
     injector.binder.install(task_bind)
 
     return config
+
+
+def get_config() -> TaskConfiguration:
+    return injector.get(TaskConfiguration, scope=singleton)
