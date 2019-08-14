@@ -39,14 +39,6 @@ jobs:
           key: 20190628-00-dependencies-{{ checksum "requirements.txt" }}
 
       - run:
-          name: check requirements.txt
-          command: |
-            . venv/bin/activate
-
-            make build
-            git diff --exit-code
-
-      - run:
           name: run tests
           command: |
             . venv/bin/activate
