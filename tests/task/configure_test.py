@@ -3,62 +3,28 @@ import os
 from injector import Injector
 from injector import singleton
 
-from gumo.task._configuration import ConfigurationFactory
+from gumo.task._configuration import configure
 from gumo.task.infrastructure.configuration import TaskConfiguration
 from gumo.task.infrastructure.configuration import _detect_suitable_version_name
 
 
-def test_configuration_factory_build():
-    o = ConfigurationFactory.build(
-        default_queue_name='gumo-default-queue',
-        use_local_task_emulator='yes',
-    )
-
-    assert o == TaskConfiguration(
-        default_queue_name='gumo-default-queue',
-        use_local_task_emulator=True,
-    )
-
-
 def test_singleton_task_configuration():
     injector = Injector()
-    config = TaskConfiguration(use_local_task_emulator=True)
-    injector.binder.bind(TaskConfiguration, to=config, scope=singleton)
+    config = configure(_injector=injector)
     fetched_config = injector.get(TaskConfiguration)
 
     assert id(config) == id(fetched_config)
-    assert fetched_config.default_queue_name is None
+    assert fetched_config.default_queue_name == 'default'
 
     fetched_config.default_queue_name = 'default-queue'
     retry_fetched_config = injector.get(TaskConfiguration)
     assert id(config) == id(retry_fetched_config)
     assert retry_fetched_config.default_queue_name == 'default-queue'
 
-
-class TestConfiguration:
-    def setup_method(self, method):
-        self.env_vars = {}
-        for k, v in os.environ.items():
-            self.env_vars[k] = v
-
-    def teardown_method(self, method):
-        for k in os.environ.keys():
-            if k not in self.env_vars:
-                del os.environ[k]
-
-        for k, v in self.env_vars.items():
-            os.environ[k] = v
-
-    def test_use_emulator(self):
-        del os.environ['CLOUD_TASKS_EMULATOR_ENABLED']
-
-        o = ConfigurationFactory.build(
-            default_queue_name='default',
-            use_local_task_emulator='yes'
-        )
-
-        assert o.cloud_tasks_location.name == 'local'
-        assert o.cloud_tasks_location.location_id == 'local'
+    configure(default_queue_name='another-queue', _injector=injector)
+    another_fetched_config = injector.get(TaskConfiguration)
+    assert id(config) == id(another_fetched_config)
+    assert another_fetched_config.default_queue_name == 'another-queue'
 
 
 class TestSuitableVersionName:
