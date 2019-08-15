@@ -14,8 +14,6 @@ logger = getLogger(__name__)
 
 
 class CloudTasksEnqueueService:
-    DEFAULT_QUEUE_NAME = 'default'
-
     @inject
     def __init__(
             self,
@@ -34,9 +32,6 @@ class CloudTasksEnqueueService:
             in_seconds: Optional[int] = None,
             queue_name: Optional[str] = None,
     ) -> GumoTask:
-        if queue_name is None:
-            queue_name = self.DEFAULT_QUEUE_NAME
-
         task = self._gumo_task_factory.build_for_new(
             relative_uri=url,
             method=method,
