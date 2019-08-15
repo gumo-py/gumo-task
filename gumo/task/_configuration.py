@@ -17,7 +17,7 @@ DEFAULT_QUEUE_NAME = 'default'
 def configure(
         default_queue_name: Optional[str] = None,
         use_local_task_emulator: Union[str, bool, None] = None,
-        _injector = None,
+        _injector=None,
 ) -> TaskConfiguration:
     if _injector is None:
         _injector = injector
