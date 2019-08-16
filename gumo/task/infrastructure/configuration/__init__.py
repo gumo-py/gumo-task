@@ -94,8 +94,10 @@ class CloudTaskLocation:
 
 @dataclasses.dataclass()
 class TaskConfiguration:
-    default_queue_name: Optional[str] = None
-    use_local_task_emulator: bool = False
+    DEFAULT_QUEUE_NAME = 'default'
+
+    default_queue_name: str = DEFAULT_QUEUE_NAME
+    use_local_task_emulator: Optional[bool] = None
     google_cloud_project: Union[GoogleCloudProjectID, str, None] = None
     gae_service_name: Optional[str] = None
     gae_version_name: Optional[str] = None
