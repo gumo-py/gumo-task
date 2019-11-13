@@ -1,18 +1,9 @@
-from injector import inject
-
 from gumo.core import EntityKey
 from gumo.task.domain import GumoTask
-from gumo.datastore.infrastructure import EntityKeyMapper
+from gumo.datastore.infrastructure import DatastoreMapperMixin
 
 
-class DatastoreGumoTaskMapper:
-    @inject
-    def __init__(
-            self,
-            entity_key_mapper: EntityKeyMapper
-    ):
-        self._entity_key_mapper = entity_key_mapper
-
+class DatastoreGumoTaskMapper(DatastoreMapperMixin):
     def to_datastore_entity(self, task: GumoTask) -> dict:
         j = {
             'relative_uri': task.relative_uri,
@@ -31,7 +22,7 @@ class DatastoreGumoTaskMapper:
             relative_uri=doc.get('relative_uri', doc.get('url')),
             method=doc.get('method'),
             payload=doc.get('payload'),
-            schedule_time=doc.get('schedule_time'),
-            created_at=doc.get('created_at'),
+            schedule_time=self.convert_datetime(doc.get('schedule_time')),
+            created_at=self.convert_datetime(doc.get('created_at')),
             queue_name=doc.get('queue_name'),
         )
