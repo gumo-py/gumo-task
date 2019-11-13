@@ -6,6 +6,8 @@ from typing import ClassVar
 from typing import Optional
 from typing import Union
 from typing import List
+from typing import Callable
+
 from logging import getLogger
 
 from googleapiclient import discovery
@@ -103,6 +105,7 @@ class TaskConfiguration:
     gae_version_name: Optional[str] = None
     cloud_tasks_location: Optional[CloudTaskLocation] = None
     client: Optional[tasks.CloudTasksClient] = None
+    fetch_request_hostname: Optional[Callable[[], str]] = None
 
     _ENV_KEY_GOOGLE_CLOUD_PROJECT: ClassVar = 'GOOGLE_CLOUD_PROJECT'
     _ENV_KEY_GAE_SERVICE: ClassVar = 'GAE_SERVICE'

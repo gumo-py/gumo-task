@@ -49,11 +49,17 @@ class GumoTaskRepositoryImpl(GumoTaskRepository, DatastoreRepositoryMixin):
             task: GumoTask,
             queue_name: Optional[str] = None
     ):
-        logger.debug(f'Use Cloud Tasks API (task={task}, queue_name={queue_name})')
+        hostname = None
+        if self._task_configuration.fetch_request_hostname is not None:
+            hostname = self._task_configuration.fetch_request_hostname()
+        elif "HTTP_HOST" in os.environ:
+            hostname = os.environ["HTTP_HOST"]
+
+        logger.debug(f'Use Cloud Tasks API (task={task}, queue_name={queue_name} with hostname={hostname})')
         self._cloud_tasks_repository.enqueue(
             task=task,
             queue_name=queue_name,
-            hostname=os.environ.get('HTTP_HOST')
+            hostname=hostname,
         )
 
     def _enqueue_to_local_emulator(
