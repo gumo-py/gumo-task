@@ -12,7 +12,7 @@ from gumo.task.application.repository import GumoTaskRepository
 from gumo.task.domain import GumoTask
 from gumo.task.infrastructure.configuration import TaskConfiguration
 from gumo.task.infrastructure.cloud_tasks import CloudTasksRepository
-from gumo.task.infrastructure.mapper import DatastoreGumoTaskMapper
+from gumo.task.infrastructure.repository.mapper import DatastoreGumoTaskMapper
 
 logger = getLogger(__name__)
 
