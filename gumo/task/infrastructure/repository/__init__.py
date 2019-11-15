@@ -12,7 +12,7 @@ from gumo.task.application.repository import GumoTaskRepository
 from gumo.task.domain import GumoTask
 from gumo.task.infrastructure.configuration import TaskConfiguration
 from gumo.task.infrastructure.cloud_tasks import CloudTasksRepository
-from gumo.task.infrastructure.mapper import DatastoreGumoTaskMapper
+from gumo.task.infrastructure.repository.mapper import DatastoreGumoTaskMapper
 
 logger = getLogger(__name__)
 
@@ -49,11 +49,17 @@ class GumoTaskRepositoryImpl(GumoTaskRepository, DatastoreRepositoryMixin):
             task: GumoTask,
             queue_name: Optional[str] = None
     ):
-        logger.debug(f'Use Cloud Tasks API (task={task}, queue_name={queue_name})')
+        hostname = None
+        if self._task_configuration.fetch_request_hostname is not None:
+            hostname = self._task_configuration.fetch_request_hostname()
+        elif "HTTP_HOST" in os.environ:
+            hostname = os.environ["HTTP_HOST"]
+
+        logger.debug(f'Use Cloud Tasks API (task={task}, queue_name={queue_name} with hostname={hostname})')
         self._cloud_tasks_repository.enqueue(
             task=task,
             queue_name=queue_name,
-            hostname=os.environ.get('HTTP_HOST')
+            hostname=hostname,
         )
 
     def _enqueue_to_local_emulator(
@@ -62,7 +68,5 @@ class GumoTaskRepositoryImpl(GumoTaskRepository, DatastoreRepositoryMixin):
             queue_name: Optional[str] = None
     ):
         logger.debug(f'Use Tasks Local Emulator with Datastore (task={task}, queue_name={queue_name})')
-        datastore_key = self.entity_key_mapper.to_datastore_key(entity_key=task.key)
-        datastore_entity = self.DatastoreEntity(key=datastore_key)
-        datastore_entity.update(self._task_mapper.to_datastore_entity(task))
+        datastore_entity = self._task_mapper.to_datastore_entity(task=task)
         self.datastore_client.put(datastore_entity)

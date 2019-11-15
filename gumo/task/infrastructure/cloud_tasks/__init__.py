@@ -43,6 +43,15 @@ class CloudTasksPayloadFactory:
         if self._gae_service_name is not None:
             app_engine_routing['version'] = self._gae_version_name
 
+        # override routing for each task configuration.
+        if self._task.app_engine_routing:
+            if self._task.app_engine_routing.service:
+                app_engine_routing['service'] = self._task.app_engine_routing.service
+            if self._task.app_engine_routing.version:
+                app_engine_routing['version'] = self._task.app_engine_routing.version
+            if self._task.app_engine_routing.instance:
+                app_engine_routing['instance'] = self._task.app_engine_routing.instance
+
         return app_engine_routing
 
     def build(self) -> dict:

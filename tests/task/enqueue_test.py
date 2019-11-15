@@ -33,7 +33,11 @@ class TestEnqueServiceWithEmulator(DatastoreRepositoryMixinForTest, DatastoreMap
         assert tasks[0]['schedule_time'] == tasks[0]['created_at']
 
     def test_enqueue_scheduled_task(self):
-        schedule_time = datetime.datetime.utcnow().replace(microsecond=0) + datetime.timedelta(hours=1)
+        schedule_time = datetime.datetime.utcnow().replace(
+            tzinfo=datetime.timezone.utc,
+            microsecond=0
+        ) + datetime.timedelta(hours=1)
+
         enqueue(
             url='/scheduled-task',
             schedule_time=schedule_time,
@@ -47,7 +51,11 @@ class TestEnqueServiceWithEmulator(DatastoreRepositoryMixinForTest, DatastoreMap
         assert self.convert_datetime(tasks[0]['schedule_time']) == schedule_time
 
     def test_enqueue_in_seconds_task(self):
-        t = datetime.datetime.utcnow().replace(microsecond=0) + datetime.timedelta(hours=1)
+        t = datetime.datetime.utcnow().replace(
+            tzinfo=datetime.timezone.utc,
+            microsecond=0,
+        ) + datetime.timedelta(hours=1)
+
         enqueue(
             url='/scheduled-task',
             in_seconds=3600
