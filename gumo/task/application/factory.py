@@ -5,6 +5,7 @@ from gumo.datastore import EntityKey
 from gumo.datastore import EntityKeyFactory
 
 from gumo.task.domain import GumoTask
+from gumo.task.domain import TaskAppEngineRouting
 
 
 class GumoTaskFactory:
@@ -18,6 +19,9 @@ class GumoTaskFactory:
             in_seconds: Optional[int] = None,
             created_at: Optional[datetime.datetime] = None,
             queue_name: Optional[str] = None,
+            service: Optional[str] = None,
+            version: Optional[str] = None,
+            instance: Optional[str] = None,
     ) -> GumoTask:
         now = datetime.datetime.utcnow().replace(microsecond=0)
 
@@ -39,6 +43,11 @@ class GumoTaskFactory:
             schedule_time=schedule_time,
             created_at=created_at if created_at else now,
             queue_name=queue_name,
+            app_engine_routing=TaskAppEngineRouting(
+                service=service,
+                version=version,
+                instance=instance,
+            )
         )
 
     def build_for_new(
@@ -50,6 +59,9 @@ class GumoTaskFactory:
             in_seconds: Optional[int] = None,
             created_at: Optional[datetime.datetime] = None,
             queue_name: Optional[str] = None,
+            service: Optional[str] = None,
+            version: Optional[str] = None,
+            instance: Optional[str] = None,
     ) -> GumoTask:
 
         return self.build(
@@ -61,4 +73,7 @@ class GumoTaskFactory:
             in_seconds=in_seconds,
             created_at=created_at,
             queue_name=queue_name,
+            service=service,
+            version=version,
+            instance=instance,
         )
