@@ -2,7 +2,7 @@ import setuptools
 
 
 name = 'gumo-task'
-version = '0.2.0'
+version = '0.2.1'
 description = 'Gumo Task Library'
 dependencies = [
     'gumo-core >= 0.1.0',
