@@ -27,7 +27,7 @@ class TestEnqueServiceWithEmulator(DatastoreRepositoryMixinForTest, DatastoreMap
         assert len(tasks) == 1
         assert tasks[0]['relative_uri'] == '/task'
         assert tasks[0]['method'] == 'POST'
-        assert tasks[0]['payload']['body'] == 'message'
+        assert tasks[0]['payload_str'] == '{"body": "message"}'
         assert tasks[0]['queue_name'] == 'test-queue'
 
         assert tasks[0]['schedule_time'] == tasks[0]['created_at']
