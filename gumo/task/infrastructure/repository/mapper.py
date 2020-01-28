@@ -8,7 +8,10 @@ from gumo.datastore.infrastructure import DatastoreEntity
 
 class DatastoreGumoTaskMapper(DatastoreMapperMixin):
     def to_datastore_entity(self, task: GumoTask) -> DatastoreEntity:
-        doc = DatastoreEntity(key=self.entity_key_mapper.to_datastore_key(task.key))
+        doc = DatastoreEntity(
+            key=self.entity_key_mapper.to_datastore_key(task.key),
+            exclude_from_indexes=("payload_str",),
+        )
 
         doc.update({
             'relative_uri': task.relative_uri,
