@@ -67,6 +67,9 @@ class CloudTasksPayloadFactory:
                 'Content-Type': 'application/json'
             }
 
+        if self._task.headers is not None:
+            app_engine_http_request['headers'].update(self._task.headers)
+
         task_dict = {
             'app_engine_http_request': app_engine_http_request,
             'name': f'{self._parent}/tasks/{self._task.key.name()}',

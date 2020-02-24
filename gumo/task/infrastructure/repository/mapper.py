@@ -17,6 +17,7 @@ class DatastoreGumoTaskMapper(DatastoreMapperMixin):
             'relative_uri': task.relative_uri,
             'method': task.method,
             'payload_str': json.dumps(task.payload),
+            'headers': json.dumps(task.headers if task.headers else {}),
             'schedule_time': task.schedule_time,
             'created_at': task.created_at,
             'queue_name': task.queue_name,
@@ -39,6 +40,10 @@ class DatastoreGumoTaskMapper(DatastoreMapperMixin):
         else:
             payload = doc.get('payload', {})
 
+        headers = {}
+        if 'headers' in doc:
+            headers = json.loads(doc.get('headers'))
+
         routing = TaskAppEngineRouting(
             service=doc.get('app_engine_routing.service'),
             version=doc.get('app_engine_routing.version'),
@@ -50,6 +55,7 @@ class DatastoreGumoTaskMapper(DatastoreMapperMixin):
             relative_uri=doc.get('relative_uri', doc.get('url')),
             method=doc.get('method'),
             payload=payload,
+            headers=headers,
             schedule_time=self.convert_datetime(doc.get('schedule_time')),
             created_at=self.convert_datetime(doc.get('created_at')),
             queue_name=doc.get('queue_name'),
