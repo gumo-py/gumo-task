@@ -1,4 +1,6 @@
 from logging import getLogger
+from typing import Callable
+
 from injector import singleton
 
 from typing import Union
@@ -17,6 +19,7 @@ DEFAULT_QUEUE_NAME = 'default'
 def configure(
         default_queue_name: Optional[str] = None,
         use_local_task_emulator: Union[str, bool, None] = None,
+        fetch_request_hostname_function: Optional[Callable[[], str]] = None,
         _injector=None,
 ) -> TaskConfiguration:
     if _injector is None:
@@ -32,6 +35,9 @@ def configure(
             config.use_local_task_emulator = use_local_task_emulator
         if isinstance(use_local_task_emulator, str):
             config.use_local_task_emulator = use_local_task_emulator.lower() in ['true', 'yes']
+
+    if fetch_request_hostname_function is not None:
+        config.fetch_request_hostname = fetch_request_hostname_function
 
     _injector.binder.bind(TaskConfiguration, to=config, scope=singleton)
     logger.debug(f'Gumo.Task is configured, config={config}')
