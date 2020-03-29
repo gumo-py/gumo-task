@@ -117,6 +117,8 @@ class TaskQueue:
         if not queue_name:
             queue_name = setting.default_queue_name
 
+        headers = self._append_headers(headers=headers)
+
         gumo_task = enqueue(
             url=url,
             queue_name=queue_name.value,
@@ -126,3 +128,6 @@ class TaskQueue:
         )
 
         return gumo_task
+
+    def _append_headers(self, headers: Optional[Dict[str, str]] = None) -> Dict[str, str]:
+        return headers
