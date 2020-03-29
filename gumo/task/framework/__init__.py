@@ -1,4 +1,5 @@
 import dataclasses
+import datetime
 from typing import Dict
 from typing import Optional
 
@@ -106,6 +107,8 @@ class TaskQueue:
         task: Task,
         queue_name: Optional[TaskQueueName] = None,
         headers: Optional[Dict[str, str]] = None,
+        schedule_time: Optional[datetime.datetime] = None,
+        in_seconds: Optional[int] = None,
     ) -> GumoTask:
         if headers is None:
             headers = {}
@@ -125,6 +128,8 @@ class TaskQueue:
             headers=headers,
             payload=payload,
             service=setting.target_service.value if setting.target_service else None,
+            schedule_time=schedule_time,
+            in_seconds=in_seconds,
         )
 
         return gumo_task
