@@ -129,5 +129,5 @@ class TaskQueue:
 
         return gumo_task
 
-    def _append_headers(self, headers: Optional[Dict[str, str]] = None) -> Dict[str, str]:
+    def _append_headers(self, headers: Dict[str, str]) -> Dict[str, str]:
         return headers
