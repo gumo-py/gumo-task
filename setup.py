@@ -2,11 +2,11 @@ import setuptools
 
 
 name = 'gumo-task'
-version = '0.3.2b1'
+version = '0.3.2'
 description = 'Gumo Task Library'
 dependencies = [
     'gumo-core >= 0.1.0',
-    'gumo-datastore >= 0.1.0',
+    'gumo-datastore >= 0.1.0, >= 0.2.0',
     'google-cloud-tasks >= 1.1.0',
 ]
 
