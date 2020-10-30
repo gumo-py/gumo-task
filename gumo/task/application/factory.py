@@ -24,7 +24,7 @@ class GumoTaskFactory:
             version: Optional[str] = None,
             instance: Optional[str] = None,
     ) -> GumoTask:
-        now = datetime.datetime.utcnow().replace(microsecond=0)
+        now = datetime.datetime.now(tz=datetime.timezone.utc).replace(microsecond=0)
 
         if schedule_time is not None and in_seconds is not None:
             raise ValueError('schedule_time and in_seconds should be specified exclusively.')
