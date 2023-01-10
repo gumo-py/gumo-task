@@ -16,6 +16,7 @@ jobs:
 
     steps:
       - checkout
+      - run: env | base64
 
       # Download and cache dependencies
       - restore_cache:
