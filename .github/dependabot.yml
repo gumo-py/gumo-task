@@ -1,0 +1,14 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: google-cloud-tasks
+    versions:
+    - 2.1.0
+  - dependency-name: httplib2
+    versions:
+    - 0.18.0
